@@ -3,7 +3,7 @@
 # MACHINE  all (Arch Linux)
 # INFO     -
 #
-# DATE     23.02.2014
+# DATE     03.03.2014
 # OWNER    Bischofberger
 # ==================================================================
 
@@ -22,7 +22,7 @@ X11LIB = /usr/lib/X11
 
 # includes and libs
 INCS = -I. -I/usr/include -I${X11INC}
-LIBS = -L/usr/lib -lc -L${X11LIB} -lX11
+LIBS = -lasound -L/usr/lib -lc -L${X11LIB} -lX11
 
 # flags
 CPPFLAGS = -DVERSION=\"${VERSION}\"
