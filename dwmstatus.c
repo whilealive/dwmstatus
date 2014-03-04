@@ -4,9 +4,8 @@
  * INFO     dwm statusline in C
  *          based on the suckless dwmstatus project under
  *          git://git.suckless.org/dwmstatus,
- *          including parts from https://github.com/Unia/dwmst/
  *
- * DATE     03.03.2014
+ * DATE     04.03.2014
  * OWNER    Bischofberger
  * ==================================================================
  */
@@ -17,18 +16,25 @@
 #include <unistd.h>  /* sleep() ... */
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdarg.h>  /* va_list ... */
+#include <stdarg.h>
 #include <string.h>
 #include <alsa/asoundlib.h>
 
 #include <X11/Xlib.h>
 
 #define INTERVAL      90
+#define BUFLENGTH     100
 #define BATT_NOW      "/sys/class/power_supply/BAT1/charge_now"
 #define BATT_FULL     "/sys/class/power_supply/BAT1/charge_full"
 #define BATT_STATUS   "/sys/class/power_supply/BAT1/status"
 
 static Display *dpy;
+
+static void die(const char *errmsg)
+{
+    fputs(errmsg, stderr);
+    exit(EXIT_FAILURE);
+}
 
 char * smprintf(char *fmt, ...)
 {
@@ -74,11 +80,12 @@ char * getbattery()
             s = '-';
         if (strcmp(status,"Full") == 0)
             s = '=';
-        return smprintf("VOL %c%ld%%", s,(full/(now/100)));
+        return smprintf("%c%ld%%", s,(full/(now/100)));
     }
     else return smprintf("");
 }
 
+/*
 char * getvol(snd_mixer_t *handle) {
     int mute = 0;
     long vol = 0, max = 0, min = 0;
@@ -102,30 +109,94 @@ char * getvol(snd_mixer_t *handle) {
         return smprintf("MUTE");
     return smprintf("VOL %d%%", (vol * 100) / max);
 }
+*/
+
+static snd_mixer_t *alsainit(const char *card)
+{
+    snd_mixer_t *handle;
+
+    snd_mixer_open(&handle, 0);
+    snd_mixer_attach(handle, card);
+    snd_mixer_selem_register(handle, NULL, NULL);
+    snd_mixer_load(handle);
+    return handle;
+}
+
+static snd_mixer_elem_t *alsamixer(snd_mixer_t *handle, const char *mixer)
+{
+    snd_mixer_selem_id_t *sid;
+
+    //snd_mixer_selem_id_alloca(&sid);
+    snd_mixer_selem_id_malloc(&sid);
+    snd_mixer_selem_id_set_index(sid, 0);
+    snd_mixer_selem_id_set_name(sid, mixer);
+    return snd_mixer_find_selem(handle, sid);
+}
+
+static int ismuted(snd_mixer_elem_t *mixer)
+{
+    int on;
+
+    snd_mixer_selem_get_playback_switch(mixer, SND_MIXER_SCHN_MONO, &on);
+    return !on;
+}
+
+static int getvol(snd_mixer_elem_t *mixer)
+{
+    long vol, min, max;
+
+    snd_mixer_selem_get_playback_volume_range(mixer, &min, &max);
+    snd_mixer_selem_get_playback_volume(mixer, SND_MIXER_SCHN_MONO, &vol);
+
+    vol = vol < max ? (vol > min ? vol : min) : max;
+    return vol * 100.0 / max + 0.5;
+}
 
 void setstatus(char *str)
 {
-	XStoreName(dpy, DefaultRootWindow(dpy), str);
-	XSync(dpy, False);
+    XStoreName(dpy, DefaultRootWindow(dpy), str);
+    XSync(dpy, False);
 }
 
 int main(void)
 {
-    char *status;
-    char *bat;
-    char *vol;
-    snd_mixer_t *handle;
+    //char *status;
+    char status[BUFLENGTH];
+    //char *bat;
+    //char *vol;
+    //snd_mixer_t *handle;
+    snd_mixer_t *alsa;
+    snd_mixer_elem_t *mixer;
 
-    if (!(dpy = XOpenDisplay(NULL))) {
-        fprintf(stderr, "dwmstatus: cannot open display.\n");
-        return 1;
-    }
+    if (!(dpy = XOpenDisplay(NULL)))
+        die("dwmstatus: cannot open display.\n");
+    if (!(alsa = alsainit("default")))
+        die("dwmstatus: cannot initialize alsa\n");
+    if (!(mixer = alsamixer(alsa, "Master")))
+        die("dwmstatus: cannot get mixer\n");
 
+    /*
     snd_mixer_open(&handle, 0);
     snd_mixer_attach(handle, "default");
     snd_mixer_selem_register(handle, NULL, NULL);
     snd_mixer_load(handle);
+    */
 
+    while (1) {
+        snprintf(status, sizeof(status), "[BAT %s] [VOL %d%%%s]", getbattery(),
+                getvol(mixer), ismuted(mixer) ? " MUTE" : "");
+        setstatus(status);
+
+        snd_mixer_wait(alsa, INTERVAL);
+        snd_mixer_handle_events(alsa);
+    }
+
+    snd_mixer_close(alsa);
+    XCloseDisplay(dpy);
+    return 0;
+
+
+    /*
     for (;;sleep(INTERVAL)) {
         bat = getbattery();
         vol = getvol(handle);
@@ -139,4 +210,5 @@ int main(void)
     XCloseDisplay(dpy);
 
     return 0;
+    */
 }
