@@ -10,7 +10,9 @@
  * ==================================================================
  */
 
-/* TODO:    - get a bit into detail with the alsa stuff
+/* FIXME:   - too high cpu consumption
+ *
+ * TODO:    - get a bit into detail with the alsa stuff
  */
 
 #include <unistd.h>  /* sleep() ... */
@@ -59,6 +61,7 @@ char * smprintf(char *fmt, ...)
     return ret;
 }
 
+/* unia */
 char * getbattery()
 {
     long full, now = 0;
@@ -85,7 +88,7 @@ char * getbattery()
     else return smprintf("");
 }
 
-/*
+/* unia */
 char * getvol(snd_mixer_t *handle) {
     int mute = 0;
     long vol = 0, max = 0, min = 0;
@@ -109,7 +112,6 @@ char * getvol(snd_mixer_t *handle) {
         return smprintf("MUTE");
     return smprintf("VOL %d%%", (vol * 100) / max);
 }
-*/
 
 static snd_mixer_t *alsainit(const char *card)
 {
@@ -141,7 +143,7 @@ static int ismuted(snd_mixer_elem_t *mixer)
     return !on;
 }
 
-static int getvol(snd_mixer_elem_t *mixer)
+static int getvol2(snd_mixer_elem_t *mixer)
 {
     long vol, min, max;
 
@@ -160,31 +162,33 @@ void setstatus(char *str)
 
 int main(void)
 {
-    //char *status;
-    char status[BUFLENGTH];
-    //char *bat;
-    //char *vol;
-    //snd_mixer_t *handle;
-    snd_mixer_t *alsa;
-    snd_mixer_elem_t *mixer;
+    char *status;
+    //char status[BUFLENGTH];
+    char *bat;
+    char *vol;
+    snd_mixer_t *handle;
+    //snd_mixer_t *alsa;
+    //snd_mixer_elem_t *mixer;
 
     if (!(dpy = XOpenDisplay(NULL)))
         die("dwmstatus: cannot open display.\n");
+    /*
     if (!(alsa = alsainit("default")))
         die("dwmstatus: cannot initialize alsa\n");
     if (!(mixer = alsamixer(alsa, "Master")))
         die("dwmstatus: cannot get mixer\n");
+        */
 
-    /*
+    /* unia */
     snd_mixer_open(&handle, 0);
     snd_mixer_attach(handle, "default");
     snd_mixer_selem_register(handle, NULL, NULL);
     snd_mixer_load(handle);
-    */
 
+    /*
     while (1) {
         snprintf(status, sizeof(status), "[BAT %s] [VOL %d%%%s]", getbattery(),
-                getvol(mixer), ismuted(mixer) ? " MUTE" : "");
+                getvol2(mixer), ismuted(mixer) ? " MUTE" : "");
         setstatus(status);
 
         snd_mixer_wait(alsa, INTERVAL);
@@ -194,9 +198,10 @@ int main(void)
     snd_mixer_close(alsa);
     XCloseDisplay(dpy);
     return 0;
+    */
 
 
-    /*
+    /* unia */
     for (;;sleep(INTERVAL)) {
         bat = getbattery();
         vol = getvol(handle);
@@ -210,5 +215,4 @@ int main(void)
     XCloseDisplay(dpy);
 
     return 0;
-    */
 }
