@@ -4,16 +4,15 @@
  * INFO     dwm statusline in C
  *          based on the suckless dwmstatus project under
  *          git://git.suckless.org/dwmstatus,
+ *          and alsa stuff from https://github.com/Unia/dwmst
  *
- * DATE     04.03.2014
+ *          Don't need time in statusbar since tmux does that for me
+ *
+ * DATE     12.03.2014
  * OWNER    Bischofberger
  * ==================================================================
  */
 
-/* FIXME:   - too high cpu consumption
- *
- * TODO:    - get a bit into detail with the alsa stuff
- */
 
 #include <unistd.h>  /* sleep() ... */
 #include <stdio.h>
@@ -21,11 +20,11 @@
 #include <stdarg.h>
 #include <string.h>
 #include <alsa/asoundlib.h>
+#include <dirent.h>  /* check directory for new files */
 
 #include <X11/Xlib.h>
 
-#define INTERVAL      90
-#define BUFLENGTH     100
+#define INTERVAL      30  /* seconds */
 #define BATT_NOW      "/sys/class/power_supply/BAT1/charge_now"
 #define BATT_FULL     "/sys/class/power_supply/BAT1/charge_full"
 #define BATT_STATUS   "/sys/class/power_supply/BAT1/status"
@@ -61,7 +60,6 @@ char * smprintf(char *fmt, ...)
     return ret;
 }
 
-/* unia */
 char * getbattery()
 {
     long full, now = 0;
@@ -88,7 +86,6 @@ char * getbattery()
     else return smprintf("");
 }
 
-/* unia */
 char * getvol(snd_mixer_t *handle) {
     int mute = 0;
     long vol = 0, max = 0, min = 0;
@@ -110,48 +107,31 @@ char * getvol(snd_mixer_t *handle) {
 
     if(mute == 0)
         return smprintf("MUTE");
-    return smprintf("VOL %d%%", (vol * 100) / max);
+    return smprintf("%d%%", (vol * 100) / max);
 }
 
-static snd_mixer_t *alsainit(const char *card)
+char *get_nmail(char *directory, char *label)
 {
-    snd_mixer_t *handle;
+    /* directory : Maildir path 
+    * return label : number_of_new_mails
+    */
+    int n = 0;
+    DIR* dir = NULL;
+    struct dirent* rf = NULL;
 
-    snd_mixer_open(&handle, 0);
-    snd_mixer_attach(handle, card);
-    snd_mixer_selem_register(handle, NULL, NULL);
-    snd_mixer_load(handle);
-    return handle;
-}
+    dir = opendir(directory); /* try to open directory */
+    if (dir == NULL)
+        perror("");
 
-static snd_mixer_elem_t *alsamixer(snd_mixer_t *handle, const char *mixer)
-{
-    snd_mixer_selem_id_t *sid;
+    while ((rf = readdir(dir)) != NULL) /*count number of file*/
+    {
+        if (strcmp(rf->d_name, ".") != 0 &&
+            strcmp(rf->d_name, "..") != 0)
+            n++;
+    }
+    closedir(dir);
 
-    //snd_mixer_selem_id_alloca(&sid);
-    snd_mixer_selem_id_malloc(&sid);
-    snd_mixer_selem_id_set_index(sid, 0);
-    snd_mixer_selem_id_set_name(sid, mixer);
-    return snd_mixer_find_selem(handle, sid);
-}
-
-static int ismuted(snd_mixer_elem_t *mixer)
-{
-    int on;
-
-    snd_mixer_selem_get_playback_switch(mixer, SND_MIXER_SCHN_MONO, &on);
-    return !on;
-}
-
-static int getvol2(snd_mixer_elem_t *mixer)
-{
-    long vol, min, max;
-
-    snd_mixer_selem_get_playback_volume_range(mixer, &min, &max);
-    snd_mixer_selem_get_playback_volume(mixer, SND_MIXER_SCHN_MONO, &vol);
-
-    vol = vol < max ? (vol > min ? vol : min) : max;
-    return vol * 100.0 / max + 0.5;
+   return smprintf("%s%d", label, n);
 }
 
 void setstatus(char *str)
@@ -163,52 +143,36 @@ void setstatus(char *str)
 int main(void)
 {
     char *status;
-    //char status[BUFLENGTH];
     char *bat;
+    char *new_fastmail;
+    char *new_uzh;
+    char *new_zhaw;
     char *vol;
     snd_mixer_t *handle;
-    //snd_mixer_t *alsa;
-    //snd_mixer_elem_t *mixer;
 
     if (!(dpy = XOpenDisplay(NULL)))
         die("dwmstatus: cannot open display.\n");
-    /*
-    if (!(alsa = alsainit("default")))
-        die("dwmstatus: cannot initialize alsa\n");
-    if (!(mixer = alsamixer(alsa, "Master")))
-        die("dwmstatus: cannot get mixer\n");
-        */
 
-    /* unia */
     snd_mixer_open(&handle, 0);
     snd_mixer_attach(handle, "default");
     snd_mixer_selem_register(handle, NULL, NULL);
     snd_mixer_load(handle);
 
-    /*
-    while (1) {
-        snprintf(status, sizeof(status), "[BAT %s] [VOL %d%%%s]", getbattery(),
-                getvol2(mixer), ismuted(mixer) ? " MUTE" : "");
-        setstatus(status);
-
-        snd_mixer_wait(alsa, INTERVAL);
-        snd_mixer_handle_events(alsa);
-    }
-
-    snd_mixer_close(alsa);
-    XCloseDisplay(dpy);
-    return 0;
-    */
-
-
-    /* unia */
     for (;;sleep(INTERVAL)) {
         bat = getbattery();
         vol = getvol(handle);
-        status = smprintf("[%s] [%s]", bat, vol);
+        new_fastmail = get_nmail("/home/laptop/Maildir/fastmail/INBOX/new", "");
+        new_uzh= get_nmail("/home/laptop/Maildir/uzh-pseudo/INBOX_uzh/new", "");
+        new_zhaw= get_nmail("/home/laptop/Maildir/zhaw-pseudo/INBOX_zhaw/new", "");
+
+        status = smprintf("[mail %s|%s|%s] [bat %s] [vol %s]", new_fastmail, new_uzh, new_zhaw, bat, vol);
         setstatus(status);
+
         free(bat);
         free(vol);
+        free(new_fastmail);
+        free(new_uzh);
+        free(new_zhaw);
         free(status);
     }
 
