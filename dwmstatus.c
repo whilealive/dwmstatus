@@ -1,6 +1,6 @@
 /* ==================================================================
  * FILE     dwmstatus.c
- * MACHINE  desktop
+ * MACHINE  laptop
  * INFO     dwm statusline in C
  *          based on the suckless dwmstatus project under
  *          git://git.suckless.org/dwmstatus,
@@ -11,6 +11,10 @@
  * DATE     12.03.2014
  * OWNER    Bischofberger
  * ==================================================================
+ */
+
+/* TODO: implement a "-desktop" option for the desktop version
+ *       without battery checking
  */
 
 
@@ -24,7 +28,7 @@
 
 #include <X11/Xlib.h>
 
-#define INTERVAL      30  /* seconds */
+#define INTERVAL      60  /* seconds */
 #define BATT_NOW      "/sys/class/power_supply/BAT1/charge_now"
 #define BATT_FULL     "/sys/class/power_supply/BAT1/charge_full"
 #define BATT_STATUS   "/sys/class/power_supply/BAT1/status"
