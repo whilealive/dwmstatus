@@ -13,16 +13,13 @@
  * ==================================================================
  */
 
-/* TODO: implement a "-desktop" option for the desktop version
- *       without battery checking
- */
-
 
 #include <unistd.h>  /* sleep() ... */
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
+#include <stdbool.h>
 #include <alsa/asoundlib.h>
 #include <dirent.h>  /* check directory for new files */
 
@@ -64,30 +61,37 @@ char * smprintf(char *fmt, ...)
     return ret;
 }
 
-char * getbattery()
+/* argument for machine type checking,
+ * does nothing if type is desktop
+ */
+char * getbattery(bool laptop)
 {
-    long full, now = 0;
-    char *status = malloc(sizeof(char)*12);
-    char s = '?';
-    FILE *fp = NULL;
-    if ((fp = fopen(BATT_NOW, "r"))) {
-        fscanf(fp, "%ld\n", &full);
-        fclose(fp);
-        fp = fopen(BATT_FULL, "r");
-        fscanf(fp, "%ld\n", &now);
-        fclose(fp);
-        fp = fopen(BATT_STATUS, "r");
-        fscanf(fp, "%s\n", status);
-        fclose(fp);
-        if (strcmp(status,"Charging") == 0)
-            s = '+';
-        if (strcmp(status,"Discharging") == 0)
-            s = '-';
-        if (strcmp(status,"Full") == 0)
-            s = '=';
-        return smprintf("%c%ld%%", s,(full/(now/100)));
+    if (!laptop)
+        return smprintf("");
+    else {
+        long full, now = 0;
+        char *status = malloc(sizeof(char)*12);
+        char s = '?';
+        FILE *fp = NULL;
+        if ((fp = fopen(BATT_NOW, "r"))) {
+            fscanf(fp, "%ld\n", &full);
+            fclose(fp);
+            fp = fopen(BATT_FULL, "r");
+            fscanf(fp, "%ld\n", &now);
+            fclose(fp);
+            fp = fopen(BATT_STATUS, "r");
+            fscanf(fp, "%s\n", status);
+            fclose(fp);
+            if (strcmp(status,"Charging") == 0)
+                s = '+';
+            if (strcmp(status,"Discharging") == 0)
+                s = '-';
+            if (strcmp(status,"Full") == 0)
+                s = '=';
+            return smprintf(" [bat %c%ld%%]", s,(full/(now/100)));
+        }
+        else return smprintf("");
     }
-    else return smprintf("");
 }
 
 char * getvol(snd_mixer_t *handle) {
@@ -144,8 +148,21 @@ void setstatus(char *str)
     XSync(dpy, False);
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
+    bool laptop;
+
+    if (argc != 2)
+        die("usage: dwmstatus [-laptop/-desktop]\n");
+    else if (!strcmp("-laptop", argv[1])) {
+        laptop = true;
+    }
+    else if (!strcmp("-desktop", argv[1])) {
+        laptop = false;
+    }
+    else
+        die("usage: dwmstatus [-laptop/-desktop]\n");
+
     char *status;
     char *bat;
     char *new_fastmail;
@@ -163,13 +180,13 @@ int main(void)
     snd_mixer_load(handle);
 
     for (;;sleep(INTERVAL)) {
-        bat = getbattery();
+        bat = getbattery(laptop);
         vol = getvol(handle);
         new_fastmail = get_nmail("/home/laptop/Maildir/fastmail/INBOX/new", "");
         new_uzh= get_nmail("/home/laptop/Maildir/uzh-pseudo/INBOX_uzh/new", "");
         new_zhaw= get_nmail("/home/laptop/Maildir/zhaw-pseudo/INBOX_zhaw/new", "");
 
-        status = smprintf("[mail %s|%s|%s] [bat %s] [vol %s]", new_fastmail, new_uzh, new_zhaw, bat, vol);
+        status = smprintf("[mail %s|%s|%s]%s [vol %s]", new_fastmail, new_uzh, new_zhaw, bat, vol);
         setstatus(status);
 
         free(bat);
