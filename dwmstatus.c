@@ -8,7 +8,7 @@
  *
  *          Don't need time in statusbar since tmux does that for me
  *
- * DATE     12.03.2014
+ * DATE     14.03.2014
  * OWNER    Bischofberger
  * ==================================================================
  */
@@ -31,6 +31,7 @@
 #define BATT_NOW      "/sys/class/power_supply/BAT1/charge_now"
 #define BATT_FULL     "/sys/class/power_supply/BAT1/charge_full"
 #define BATT_STATUS   "/sys/class/power_supply/BAT1/status"
+#define ROUND_UNSIGNED(d)   ( (int) ((d) + ((d) > 0 ? 0.5 : -0.5)) )
 
 static Display *dpy;
 
@@ -90,7 +91,7 @@ char * getbattery(bool laptop)
                 s = '-';
             if (strcmp(status,"Full") == 0)
                 s = '=';
-            return smprintf(" [bat %c%ld%%]", s,(full/(now/100)));
+            return smprintf(" [bat %c%ld]", s,(full/(now/100)));
         }
         else return smprintf("");
     }
@@ -117,7 +118,8 @@ char * getvol(snd_mixer_t *handle) {
 
     if(mute == 0)
         return smprintf("MUTE");
-    return smprintf("%d%%", (vol * 100) / max);
+    return smprintf("%d", ROUND_UNSIGNED((vol*10.0)/max));
+    //return smprintf("%d%%", (vol * 100) / max);
 }
 
 char *get_nmail(char *directory, char *label)
