@@ -13,6 +13,8 @@
  * ==================================================================
  */
 
+/* TODO: implement gtk+ warning window if bat is really low
+ */
 
 #include <unistd.h>  /* sleep() ... */
 #include <stdio.h>
