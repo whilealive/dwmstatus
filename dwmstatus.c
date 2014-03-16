@@ -27,7 +27,7 @@
 
 #include <X11/Xlib.h>
 
-#define INTERVAL            5  /* seconds */
+#define INTERVAL            10  /* seconds */
 #define BATT_NOW            "/sys/class/power_supply/BAT1/charge_now"
 #define BATT_FULL           "/sys/class/power_supply/BAT1/charge_full"
 #define BATT_STATUS         "/sys/class/power_supply/BAT1/status"
