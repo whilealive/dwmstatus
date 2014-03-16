@@ -8,12 +8,12 @@
  *
  *          Don't need time in statusbar since tmux does that for me
  *
- * DATE     14.03.2014
+ * DATE     16.03.2014
  * OWNER    Bischofberger
  * ==================================================================
  */
 
-/* TODO: implement gtk+ warning window if bat is really low
+/* TODO: implement a gtk+ warning window if bat is really low
  */
 
 #include <unistd.h>  /* sleep() ... */
@@ -27,10 +27,10 @@
 
 #include <X11/Xlib.h>
 
-#define INTERVAL      60  /* seconds */
-#define BATT_NOW      "/sys/class/power_supply/BAT1/charge_now"
-#define BATT_FULL     "/sys/class/power_supply/BAT1/charge_full"
-#define BATT_STATUS   "/sys/class/power_supply/BAT1/status"
+#define INTERVAL            5  /* seconds */
+#define BATT_NOW            "/sys/class/power_supply/BAT1/charge_now"
+#define BATT_FULL           "/sys/class/power_supply/BAT1/charge_full"
+#define BATT_STATUS         "/sys/class/power_supply/BAT1/status"
 #define ROUND_UNSIGNED(d)   ( (int) ((d) + ((d) > 0 ? 0.5 : -0.5)) )
 
 static Display *dpy;
@@ -67,11 +67,9 @@ char * smprintf(char *fmt, ...)
 /* argument for machine type checking,
  * does nothing if type is desktop
  */
-char * getbattery(bool laptop)
+char * getbattery(bool checkbat)
 {
-    if (!laptop)
-        return smprintf("");
-    else {
+    if (checkbat) {
         long full, now = 0;
         char *status = malloc(sizeof(char)*12);
         char s = '?';
@@ -91,35 +89,42 @@ char * getbattery(bool laptop)
                 s = '-';
             if (strcmp(status,"Full") == 0)
                 s = '=';
-            return smprintf(" [bat %c%ld]", s,(full/(now/100)));
+            return smprintf("[bat %c%ld] ", s,(full/(now/100)));
         }
-        else return smprintf("");
+        else
+            return smprintf("");
     }
+    else 
+        return smprintf("");
 }
 
-char * getvol(snd_mixer_t *handle) {
-    int mute = 0;
-    long vol = 0, max = 0, min = 0;
-    snd_mixer_elem_t *pcm_mixer, *max_mixer;
-    snd_mixer_selem_id_t *vol_info, *mute_info;
+char * getvol(bool checkvol, snd_mixer_t *handle) {
+    if (checkvol) {
+        int mute = 0;
+        long vol = 0, max = 0, min = 0;
+        snd_mixer_elem_t *pcm_mixer, *max_mixer;
+        snd_mixer_selem_id_t *vol_info, *mute_info;
 
-    snd_mixer_handle_events(handle);
-    snd_mixer_selem_id_malloc(&vol_info);
-    snd_mixer_selem_id_malloc(&mute_info);
-    snd_mixer_selem_id_set_name(vol_info, "Master");
-    snd_mixer_selem_id_set_name(mute_info, "Master");
-    pcm_mixer = snd_mixer_find_selem(handle, vol_info);
-    max_mixer = snd_mixer_find_selem(handle, mute_info);
-    snd_mixer_selem_get_playback_volume_range(pcm_mixer, &min, &max);
-    snd_mixer_selem_get_playback_volume(pcm_mixer, 0, &vol);
-    snd_mixer_selem_get_playback_switch(max_mixer, 0, &mute);
-    snd_mixer_selem_id_free(vol_info);
-    snd_mixer_selem_id_free(mute_info);
+        snd_mixer_handle_events(handle);
+        snd_mixer_selem_id_malloc(&vol_info);
+        snd_mixer_selem_id_malloc(&mute_info);
+        snd_mixer_selem_id_set_name(vol_info, "Master");
+        snd_mixer_selem_id_set_name(mute_info, "Master");
+        pcm_mixer = snd_mixer_find_selem(handle, vol_info);
+        max_mixer = snd_mixer_find_selem(handle, mute_info);
+        snd_mixer_selem_get_playback_volume_range(pcm_mixer, &min, &max);
+        snd_mixer_selem_get_playback_volume(pcm_mixer, 0, &vol);
+        snd_mixer_selem_get_playback_switch(max_mixer, 0, &mute);
+        snd_mixer_selem_id_free(vol_info);
+        snd_mixer_selem_id_free(mute_info);
 
-    if(mute == 0)
-        return smprintf("MUTE");
-    return smprintf("%d", ROUND_UNSIGNED((vol*10.0)/max));
-    //return smprintf("%d%%", (vol * 100) / max);
+        if(mute == 0)
+            return smprintf("[MUTE]");
+        return smprintf("[vol %d]", ROUND_UNSIGNED((vol*10.0)/max));
+        //return smprintf("%d%%", (vol * 100) / max);
+    }
+    else
+        return smprintf("");
 }
 
 char *get_nmail(char *directory, char *label)
@@ -131,14 +136,12 @@ char *get_nmail(char *directory, char *label)
     DIR* dir = NULL;
     struct dirent* rf = NULL;
 
-    dir = opendir(directory); /* try to open directory */
+    dir = opendir(directory);  /* try to open directory */
     if (dir == NULL)
         perror("");
 
-    while ((rf = readdir(dir)) != NULL) /*count number of file*/
-    {
-        if (strcmp(rf->d_name, ".") != 0 &&
-            strcmp(rf->d_name, "..") != 0)
+    while ((rf = readdir(dir)) != NULL) {  /*count number of files */
+        if (strcmp(rf->d_name, ".") != 0 && strcmp(rf->d_name, "..") != 0)
             n++;
     }
     closedir(dir);
@@ -154,18 +157,32 @@ void setstatus(char *str)
 
 int main(int argc, char *argv[])
 {
-    bool laptop;
+    bool checkbat;
+    bool checkvol;
+    char *mail_fast;
+    char *mail_uzh;
+    char *mail_zhaw;
 
-    if (argc != 2)
-        die("usage: dwmstatus [-laptop/-desktop]\n");
-    else if (!strcmp("-laptop", argv[1])) {
-        laptop = true;
+    if (argc != 2) {
+        die("usage: dwmstatus [--laptop/--desktop]\n");
     }
-    else if (!strcmp("-desktop", argv[1])) {
-        laptop = false;
+    else if (!strcmp("--laptop", argv[1])) {
+        checkbat = true;
+        checkvol = true;
+        mail_fast = "/home/laptop/Maildir/fastmail/INBOX/new";
+        mail_uzh  = "/home/laptop/Maildir/uzh-pseudo/INBOX_uzh/new";
+        mail_zhaw = "/home/laptop/Maildir/zhaw-pseudo/INBOX_zhaw/new";
     }
-    else
-        die("usage: dwmstatus [-laptop/-desktop]\n");
+    else if (!strcmp("--desktop", argv[1])) {
+        checkbat = false;
+        checkvol = false;
+        mail_fast = "/home/desktop/Maildir/fastmail/INBOX/new";
+        mail_uzh  = "/home/desktop/Maildir/uzh-pseudo/INBOX_uzh/new";
+        mail_zhaw = "/home/desktop/Maildir/zhaw-pseudo/INBOX_zhaw/new";
+    }
+    else {
+        die("usage: dwmstatus [--laptop/--desktop]\n");
+    }
 
     char *status;
     char *bat;
@@ -178,19 +195,21 @@ int main(int argc, char *argv[])
     if (!(dpy = XOpenDisplay(NULL)))
         die("dwmstatus: cannot open display.\n");
 
-    snd_mixer_open(&handle, 0);
-    snd_mixer_attach(handle, "default");
-    snd_mixer_selem_register(handle, NULL, NULL);
-    snd_mixer_load(handle);
+    if (checkvol) {
+        snd_mixer_open(&handle, 0);
+        snd_mixer_attach(handle, "default");
+        snd_mixer_selem_register(handle, NULL, NULL);
+        snd_mixer_load(handle);
+    }
 
     for (;;sleep(INTERVAL)) {
-        bat = getbattery(laptop);
-        vol = getvol(handle);
-        new_fastmail = get_nmail("/home/laptop/Maildir/fastmail/INBOX/new", "");
-        new_uzh= get_nmail("/home/laptop/Maildir/uzh-pseudo/INBOX_uzh/new", "");
-        new_zhaw= get_nmail("/home/laptop/Maildir/zhaw-pseudo/INBOX_zhaw/new", "");
+        bat = getbattery(checkbat);
+        vol = getvol(checkvol, handle);
+        new_fastmail = get_nmail(mail_fast, "");
+        new_uzh= get_nmail(mail_uzh, "");
+        new_zhaw= get_nmail(mail_zhaw, "");
 
-        status = smprintf("[mail %s|%s|%s]%s [vol %s]", new_fastmail, new_uzh, new_zhaw, bat, vol);
+        status = smprintf("[mail %s|%s|%s] %s%s", new_fastmail, new_uzh, new_zhaw, bat, vol);
         setstatus(status);
 
         free(bat);
