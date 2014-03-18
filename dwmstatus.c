@@ -8,12 +8,14 @@
  *
  *          Don't need time in statusbar since tmux does that for me
  *
- * DATE     16.03.2014
+ * DATE     18.03.2014
  * OWNER    Bischofberger
  * ==================================================================
  */
 
-/* TODO: implement a gtk+ warning window if bat is really low
+/* TODO: - implement a gtk+ warning window if bat is really low
+ *       - write as a daemon to prevent from crashing when suspending
+ *       - maybe with time anyway...?
  */
 
 #include <unistd.h>  /* sleep() ... */
@@ -34,6 +36,14 @@
 #define ROUND_UNSIGNED(d)   ( (int) ((d) + ((d) > 0 ? 0.5 : -0.5)) )
 
 static Display *dpy;
+
+typedef struct {
+    bool checkbat;
+    bool checkvol;
+    char *mail_fast;
+    char *mail_uzh;
+    char *mail_zhaw;
+} init;
 
 static void die(const char *errmsg)
 {
@@ -64,9 +74,6 @@ char * smprintf(char *fmt, ...)
     return ret;
 }
 
-/* argument for machine type checking,
- * does nothing if type is desktop
- */
 char * getbattery(bool checkbat)
 {
     if (checkbat) {
@@ -94,8 +101,21 @@ char * getbattery(bool checkbat)
         else
             return smprintf("");
     }
-    else 
+    else  /* return empty string if machine does not support bat checking */
         return smprintf("");
+}
+
+snd_mixer_t *initvol(bool checkvol)
+{
+    snd_mixer_t *handle;
+
+    if(checkvol) {
+        snd_mixer_open(&handle, 0);
+        snd_mixer_attach(handle, "default");
+        snd_mixer_selem_register(handle, NULL, NULL);
+        snd_mixer_load(handle);
+    }
+    return handle;
 }
 
 char * getvol(bool checkvol, snd_mixer_t *handle) {
@@ -149,6 +169,32 @@ char *get_nmail(char *directory, char *label)
    return smprintf("%s%d", label, n);
 }
 
+init initstatus(char *machine)
+{
+    init tmp;
+
+    if(!strcmp("--laptop", machine)) {
+        tmp.checkbat = true;
+        tmp.checkvol = true;
+        tmp.mail_fast = "/home/laptop/Maildir/fastmail/INBOX/new";
+        tmp.mail_uzh  = "/home/laptop/Maildir/uzh-pseudo/INBOX_uzh/new";
+        tmp.mail_zhaw = "/home/laptop/Maildir/zhaw-pseudo/INBOX_zhaw/new";
+        return tmp;
+    }
+    else if(!strcmp("--desktop", machine)) {
+        tmp.checkbat = false;
+        tmp.checkvol = false;
+        tmp.mail_fast = "/home/desktop/Maildir/fastmail/INBOX/new";
+        tmp.mail_uzh  = "/home/desktop/Maildir/uzh-pseudo/INBOX_uzh/new";
+        tmp.mail_zhaw = "/home/desktop/Maildir/zhaw-pseudo/INBOX_zhaw/new";
+        return tmp;
+    }
+    else {
+        die("usage: dwmstatus [--laptop/--desktop]\n");
+    }
+    return tmp;
+}
+
 void setstatus(char *str)
 {
     XStoreName(dpy, DefaultRootWindow(dpy), str);
@@ -157,32 +203,13 @@ void setstatus(char *str)
 
 int main(int argc, char *argv[])
 {
-    bool checkbat;
-    bool checkvol;
-    char *mail_fast;
-    char *mail_uzh;
-    char *mail_zhaw;
+    if (argc != 2)
+        die("usage: dwmstatus [--laptop/--desktop]\n");
+    if (!(dpy = XOpenDisplay(NULL)))
+        die("dwmstatus: cannot open display.\n");
 
-    if (argc != 2) {
-        die("usage: dwmstatus [--laptop/--desktop]\n");
-    }
-    else if (!strcmp("--laptop", argv[1])) {
-        checkbat = true;
-        checkvol = true;
-        mail_fast = "/home/laptop/Maildir/fastmail/INBOX/new";
-        mail_uzh  = "/home/laptop/Maildir/uzh-pseudo/INBOX_uzh/new";
-        mail_zhaw = "/home/laptop/Maildir/zhaw-pseudo/INBOX_zhaw/new";
-    }
-    else if (!strcmp("--desktop", argv[1])) {
-        checkbat = false;
-        checkvol = false;
-        mail_fast = "/home/desktop/Maildir/fastmail/INBOX/new";
-        mail_uzh  = "/home/desktop/Maildir/uzh-pseudo/INBOX_uzh/new";
-        mail_zhaw = "/home/desktop/Maildir/zhaw-pseudo/INBOX_zhaw/new";
-    }
-    else {
-        die("usage: dwmstatus [--laptop/--desktop]\n");
-    }
+    init mach;
+    mach = initstatus(argv[1]);
 
     char *status;
     char *bat;
@@ -190,24 +217,16 @@ int main(int argc, char *argv[])
     char *new_uzh;
     char *new_zhaw;
     char *vol;
+
     snd_mixer_t *handle;
-
-    if (!(dpy = XOpenDisplay(NULL)))
-        die("dwmstatus: cannot open display.\n");
-
-    if (checkvol) {
-        snd_mixer_open(&handle, 0);
-        snd_mixer_attach(handle, "default");
-        snd_mixer_selem_register(handle, NULL, NULL);
-        snd_mixer_load(handle);
-    }
+    handle = initvol(mach.checkvol);
 
     for (;;sleep(INTERVAL)) {
-        bat = getbattery(checkbat);
-        vol = getvol(checkvol, handle);
-        new_fastmail = get_nmail(mail_fast, "");
-        new_uzh= get_nmail(mail_uzh, "");
-        new_zhaw= get_nmail(mail_zhaw, "");
+        bat = getbattery(mach.checkbat);
+        vol = getvol(mach.checkvol, handle);
+        new_fastmail = get_nmail(mach.mail_fast, "");
+        new_uzh= get_nmail(mach.mail_uzh, "");
+        new_zhaw= get_nmail(mach.mail_zhaw, "");
 
         status = smprintf("[mail %s|%s|%s] %s%s", new_fastmail, new_uzh, new_zhaw, bat, vol);
         setstatus(status);
