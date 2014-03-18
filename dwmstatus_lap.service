@@ -1,0 +1,13 @@
+[Unit]
+Description=Restart dwmstatus after suspend  (--laptop version)
+After=suspend.target
+
+[Service]
+User=%I
+Type=simple
+Environment=DISPLAY=:0
+ExecStartPre=-/usr/bin/killall dwmstatus ; -/usr/bin/sleep 3
+ExecStart=/usr/bin/dwmstatus --laptop
+
+[Install]
+WantedBy=suspend.target
