@@ -24,14 +24,13 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
-#include <stdbool.h>
 #include <alsa/asoundlib.h>
 #include <time.h>
 #include <dirent.h>  /* check directory for new files */
 
 #include <X11/Xlib.h>
 
-#define INTERVAL            10  /* seconds */
+#define INTERVAL            60  /* seconds */
 #define BATT_NOW            "/sys/class/power_supply/BAT1/charge_now"
 #define BATT_FULL           "/sys/class/power_supply/BAT1/charge_full"
 #define BATT_STATUS         "/sys/class/power_supply/BAT1/status"
