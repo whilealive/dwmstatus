@@ -1,3 +1,4 @@
+# vim: set ai noet sw=4 ts=4:
 # ==================================================================
 # FILE     Makefile (for dwmstatus, src/ level)
 # MACHINE  all
