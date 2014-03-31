@@ -35,13 +35,7 @@
 
 static Display *dpy;
 
-typedef struct {
-    char *mail_fast;
-    char *mail_uzh;
-    char *mail_zhaw;
-} mailbox;
-
-static void die(const char *errmsg)
+void die(const char *errmsg)
 {
     fputs(errmsg, stderr);
     exit(EXIT_FAILURE);
@@ -70,6 +64,12 @@ char * smprintf(char *fmt, ...)
     return ret;
 }
 
+void setstatus(char *str)
+{
+    XStoreName(dpy, DefaultRootWindow(dpy), str);
+    XSync(dpy, False);
+}
+
 /* LAPTOP VERSION */
 int main()
 {
@@ -88,7 +88,7 @@ int main()
     handle = initvol();
 
     mailbox box;
-    box = initmail(argv[1]);
+    box = initmail("laptop");
 
     for (;;sleep(INTERVAL)) {
         bat = getbattery();
@@ -109,6 +109,44 @@ int main()
         free(bat);
         free(status);
     }
+    XCloseDisplay(dpy);
+    return 0;
 }
 
-/* DESKTOP VERSION */
+/* DESKTOP VERSION:
+ * uncomment and recompile
+ */
+/*
+int main()
+{
+    if (!(dpy = XOpenDisplay(NULL))) {
+        die("dwmstatus: cannot open display.\n");
+    }
+    char *status;
+    char *time;
+    char *new_fastmail;
+    char *new_uzh;
+    char *new_zhaw;
+
+    mailbox box;
+    box = initmail("desktop");
+
+    for (;;sleep(INTERVAL)) {
+        time = gettime();
+        new_fastmail = get_nmail(box.mail_fast);
+        new_uzh= get_nmail(box.mail_uzh);
+        new_zhaw= get_nmail(box.mail_zhaw);
+
+        status = smprintf("[mail %s|%s|%s] %s", new_fastmail, new_uzh, new_zhaw, time);
+        setstatus(status);
+
+        free(new_zhaw);
+        free(new_uzh);
+        free(new_fastmail);
+        free(time);
+        free(status);
+    }
+    XCloseDisplay(dpy);
+    return 0;
+}
+*/

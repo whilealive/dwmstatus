@@ -27,6 +27,28 @@
 #include <dirent.h>  /* check directory for new files */
 #include "dwmstatus.h"
 
+mailbox initmail(char *machine)
+{
+    mailbox tmp;
+
+    if(!strcmp("laptop", machine)) {
+        tmp.mail_fast = MAIL_LAP_FAST;
+        tmp.mail_uzh  = MAIL_LAP_UZH;
+        tmp.mail_zhaw = MAIL_LAP_ZHAW;
+        return tmp;
+    }
+    else if(!strcmp("desktop", machine)) {
+        tmp.mail_fast = MAIL_DESK_FAST;
+        tmp.mail_uzh  = MAIL_DESK_UZH;
+        tmp.mail_zhaw = MAIL_DESK_ZHAW;
+        return tmp;
+    }
+    else {
+        die("initmail: invalid argument\n");
+    }
+    return tmp;
+}
+
 char *get_nmail(char *directory)
 {
     /* directory : Maildir path */

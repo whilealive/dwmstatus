@@ -3,13 +3,13 @@
 # MACHINE  all (Arch Linux)
 # INFO     -
 #
-# DATE     03.03.2014
+# DATE     31.03.2014
 # OWNER    Bischofberger
 # ==================================================================
 
 
 NAME = dwmstatus
-VERSION = 1.2
+VERSION = 1.5
 
 # Customize below to fit your system
 
