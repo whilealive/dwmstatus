@@ -1,0 +1,34 @@
+/* ==================================================================
+ * FILE     dwmstatus.h
+ * MACHINE  all
+ * INFO     dwm statusline in C
+ *          based on the suckless dwmstatus project under
+ *          git://git.suckless.org/dwmstatus,
+ *          and alsa stuff from https://github.com/Unia/dwmst
+ *
+ *          Attention: dwmstatus is likely to crash when suspending 
+ *          computer while it is not in sleep() state. Therefore, 
+ *          we have to run a custom systemd service (or bash script) 
+ *          which kills it (if necessary) and re-runs it after 
+ *          waking up.
+ *
+ * DATE     31.03.2014
+ * OWNER    Bischofberger
+ * ==================================================================
+ */
+
+#define INTERVAL            60  /* seconds */
+#define BATT_NOW            "/sys/class/power_supply/BAT1/charge_now"
+#define BATT_FULL           "/sys/class/power_supply/BAT1/charge_full"
+#define BATT_STATUS         "/sys/class/power_supply/BAT1/status"
+#define ROUND_UNSIGNED(d)   ( (int) ((d) + ((d) > 0 ? 0.5 : -0.5)) )
+
+static void die();
+char * smprintf(char *fmt, ...);
+char * getbattery();
+snd_mixer_t *initvol();
+char * getvol(snd_mixer_t *handle);
+char *get_nmail(char *directory);
+char *gettime();
+mailbox initmail(char *machine);
+void setstatus(char *str);
