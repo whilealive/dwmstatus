@@ -12,10 +12,12 @@
  *          which kills it (if necessary) and re-runs it after 
  *          waking up.
  *
- * DATE     31.03.2014
+ * DATE     03.04.2014
  * OWNER    Bischofberger
  * ==================================================================
  */
+
+#include <alsa/asoundlib.h>  /* needed for snd_mixer_t type */
 
 #define INTERVAL            60  /* seconds */
 

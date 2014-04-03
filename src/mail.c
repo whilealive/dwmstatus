@@ -12,19 +12,14 @@
  *          which kills it (if necessary) and re-runs it after 
  *          waking up.
  *
- * DATE     31.03.2014
+ * DATE     03.04.2014
  * OWNER    Bischofberger
  * ==================================================================
  */
 
-#include <unistd.h>  /* sleep() ... */
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
 #include <string.h>
-#include <alsa/asoundlib.h>
-#include <time.h>
 #include <dirent.h>  /* check directory for new files */
+
 #include "dwmstatus.h"
 
 mailbox initmail(char *machine)

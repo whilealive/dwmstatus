@@ -16,7 +16,7 @@
  *          For laptop: un-comment "laptop" section, for desktop do
  *          so with the "desktop" section
  *
- * DATE     31.03.2014
+ * DATE     03.04.2014
  * OWNER    Bischofberger
  * ==================================================================
  */
@@ -25,12 +25,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
-#include <string.h>
-#include <alsa/asoundlib.h>
-#include <time.h>
-#include <dirent.h>  /* check directory for new files */
 
 #include <X11/Xlib.h>
+
 #include "dwmstatus.h"
 
 static Display *dpy;
