@@ -3,8 +3,10 @@
 # FILE     Makefile (for dwmstatus, src/ level)
 # MACHINE  all
 # INFO     dwm statusline in C
+# 		   for desktop/laptop version change uncomment the two
+# 		   lines on top
 #
-# DATE     31.03.2014
+# DATE     09.04.2014
 # OWNER    Bischofberger
 # ==================================================================
 #
@@ -12,8 +14,17 @@
 
 include config.mk
 
-SRC = main.c  # vorher dwmstatus.c
-OBJS = batt.o mail.o vol.o time.o main.o
+# DESKTOP VERSION
+# ---------------
+#MAIN = main_desktop
+#OBJS = mail.o time.o ${MAIN}.o
+
+# LAPTOP VERSION
+# ---------------
+MAIN = main_laptop
+OBJS = batt.o mail.o vol.o time.o ${MAIN}.o
+
+SRC = ${MAIN}.c
 
 all: options ${NAME}
 

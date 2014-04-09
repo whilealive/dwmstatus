@@ -1,5 +1,5 @@
 /* ==================================================================
- * FILE     main.c (Project: dwmstatus)
+ * FILE     main_laptop.c (Project: dwmstatus)
  * MACHINE  all
  * INFO     dwm statusline in C
  *          based on the suckless dwmstatus project under
@@ -16,7 +16,7 @@
  *          For laptop: un-comment "laptop" section, for desktop do
  *          so with the "desktop" section
  *
- * DATE     03.04.2014
+ * DATE     09.04.2014
  * OWNER    Bischofberger
  * ==================================================================
  */
@@ -109,41 +109,3 @@ int main()
     XCloseDisplay(dpy);
     return 0;
 }
-
-/* DESKTOP VERSION:
- * uncomment and recompile
- */
-/*
-int main()
-{
-    if (!(dpy = XOpenDisplay(NULL))) {
-        die("dwmstatus: cannot open display.\n");
-    }
-    char *status;
-    char *time;
-    char *new_fastmail;
-    char *new_uzh;
-    char *new_zhaw;
-
-    mailbox box;
-    box = initmail("desktop");
-
-    for (;;sleep(INTERVAL)) {
-        time = gettime();
-        new_fastmail = get_nmail(box.mail_fast);
-        new_uzh= get_nmail(box.mail_uzh);
-        new_zhaw= get_nmail(box.mail_zhaw);
-
-        status = smprintf("[mail %s|%s|%s] %s", new_fastmail, new_uzh, new_zhaw, time);
-        setstatus(status);
-
-        free(new_zhaw);
-        free(new_uzh);
-        free(new_fastmail);
-        free(time);
-        free(status);
-    }
-    XCloseDisplay(dpy);
-    return 0;
-}
-*/
