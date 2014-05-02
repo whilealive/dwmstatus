@@ -12,9 +12,12 @@
  *          which kills it (if necessary) and re-runs it after 
  *          waking up.
  *
- * DATE     03.04.2014
+ * DATE     02.05.2014
  * OWNER    Bischofberger
  * ==================================================================
+ */
+
+/* TODO: better error handling
  */
 
 #include <string.h>
