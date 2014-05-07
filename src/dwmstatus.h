@@ -12,7 +12,7 @@
  *          which kills it (if necessary) and re-runs it after 
  *          waking up.
  *
- * DATE     03.04.2014
+ * DATE     07.05.2014
  * OWNER    Bischofberger
  * ==================================================================
  */
@@ -25,6 +25,7 @@
 #define BATT_FULL           "/sys/class/power_supply/BAT1/charge_full"
 #define BATT_STATUS         "/sys/class/power_supply/BAT1/status"
 
+/*
 #define MAIL_LAP_FAST       "/home/laptop/Maildir/fastmail/INBOX/new"
 #define MAIL_LAP_UZH        "/home/laptop/Maildir/uzh-pseudo/INBOX_uzh/new"
 #define MAIL_LAP_ZHAW       "/home/laptop/Maildir/zhaw-pseudo/INBOX_zhaw/new"
@@ -32,6 +33,15 @@
 #define MAIL_DESK_FAST      "/home/desktop/Maildir/fastmail/INBOX/new"
 #define MAIL_DESK_UZH       "/home/desktop/Maildir/uzh-pseudo/INBOX_uzh/new"
 #define MAIL_DESK_ZHAW      "/home/desktop/Maildir/zhaw-pseudo/INBOX_zhaw/new"
+*/
+
+#define MAIL_LAP_FAST       "/home/laptop/Maildir/fastmail/INBOX/new"
+#define MAIL_LAP_UZH        "/home/laptop/Maildir/uzh-pseudo/uzh/new"
+#define MAIL_LAP_ZHAW       "/home/laptop/Maildir/zhaw-pseudo/zhaw/new"
+
+#define MAIL_DESK_FAST      "/home/desktop/Maildir/fastmail/INBOX/new"
+#define MAIL_DESK_UZH       "/home/desktop/Maildir/uzh-pseudo/uzh/new"
+#define MAIL_DESK_ZHAW      "/home/desktop/Maildir/zhaw-pseudo/zhaw/new"
 
 #define ROUND_UNSIGNED(d)   ( (int) ((d) + ((d) > 0 ? 0.5 : -0.5)) )
 
