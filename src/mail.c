@@ -12,7 +12,7 @@
  *          which kills it (if necessary) and re-runs it after 
  *          waking up.
  *
- * DATE     02.05.2014
+ * DATE     09.05.2014
  * OWNER    Bischofberger
  * ==================================================================
  */
@@ -56,7 +56,7 @@ char *get_nmail(char *directory)
 
     dir = opendir(directory);  /* try to open directory */
     if (dir == NULL) {
-        perror("");
+        return smprintf("e");
     }
     while ((rf = readdir(dir)) != NULL) {  /*count number of files */
         if (strcmp(rf->d_name, ".") != 0 && strcmp(rf->d_name, "..") != 0) {
