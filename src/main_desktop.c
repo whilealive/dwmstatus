@@ -16,7 +16,7 @@
  *          For laptop: un-comment "laptop" section, for desktop do
  *          so with the "desktop" section
  *
- * DATE     09.04.2014
+ * DATE     13.05.2014
  * OWNER    Bischofberger
  * ==================================================================
  */
@@ -74,27 +74,33 @@ int main()
         die("dwmstatus: cannot open display.\n");
     }
     char *status;
+    char *vol;
     char *time;
     char *new_fastmail;
     char *new_uzh;
     char *new_zhaw;
 
+    snd_mixer_t *handle;
+    handle = initvol();
+
     mailbox box;
     box = initmail("desktop");
 
     for (;;sleep(INTERVAL)) {
+        vol = getvol(handle);
         time = gettime();
         new_fastmail = get_nmail(box.mail_fast);
         new_uzh= get_nmail(box.mail_uzh);
         new_zhaw= get_nmail(box.mail_zhaw);
 
-        status = smprintf("[mail %s|%s|%s] %s", new_fastmail, new_uzh, new_zhaw, time);
+        status = smprintf("[mail %s|%s|%s] %s %s", new_fastmail, new_uzh, new_zhaw, vol, time);
         setstatus(status);
 
         free(new_zhaw);
         free(new_uzh);
         free(new_fastmail);
         free(time);
+        free(vol);
         free(status);
     }
     XCloseDisplay(dpy);
