@@ -1,0 +1,11 @@
+# ==================================================================
+# FILE     .gitignore (for dwmstatus repository))
+# MACHINE  all
+# INFO     -
+#
+# DATE     12.08.2014
+# OWNER    Bischofberger
+# ==================================================================
+
+# git shall ignore the following
+old/
