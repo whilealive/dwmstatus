@@ -16,7 +16,7 @@
  *          For laptop: un-comment "laptop" section, for desktop do
  *          so with the "desktop" section
  *
- * DATE     03.09.2014
+ * DATE     26.12.2014
  * OWNER    Bischofberger
  * ==================================================================
  */
@@ -77,7 +77,6 @@ int main()
     char *vol;
     char *time;
     char *new_fastmail;
-    char *new_uzh;
 
     snd_mixer_t *handle;
     handle = initvol();
@@ -89,12 +88,10 @@ int main()
         vol = getvol(handle);
         time = gettime();
         new_fastmail = get_nmail(box.mail_fast);
-        new_uzh= get_nmail(box.mail_uzh);
 
-        status = smprintf("[mail %s|%s] %s %s", new_fastmail, new_uzh, vol, time);
+        status = smprintf("[mail %s] %s %s", new_fastmail, vol, time);
         setstatus(status);
 
-        free(new_uzh);
         free(new_fastmail);
         free(time);
         free(vol);
