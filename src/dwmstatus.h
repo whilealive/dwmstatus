@@ -12,7 +12,7 @@
  *          which kills it (if necessary) and re-runs it after 
  *          waking up.
  *
- * DATE     26.12.2014
+ * DATE     14.07.2015
  * OWNER    Bischofberger
  * ==================================================================
  */
@@ -26,13 +26,16 @@
 #define BATT_STATUS         "/sys/class/power_supply/BAT1/status"
 
 #define MAIL_LAP_FAST       "/home/laptop/Maildir/fastmail/INBOX/new"
+#define MAIL_LAP_BMZ        "/home/laptop/Maildir/bmz/INBOX/new"
 
 #define MAIL_DESK_FAST      "/home/desktop/Maildir/fastmail/INBOX/new"
+#define MAIL_DESK_BMZ       "/home/desktop/Maildir/bmz/INBOX/new"
 
 #define ROUND_UNSIGNED(d)   ( (int) ((d) + ((d) > 0 ? 0.5 : -0.5)) )
 
 typedef struct {
     char *mail_fast;
+    char *mail_bmz;
 } mailbox;
 
 void die();
@@ -42,5 +45,6 @@ snd_mixer_t *initvol();
 char * getvol(snd_mixer_t *handle);
 char *get_nmail(char *directory);
 char *gettime();
+char *getTimeAndDate();
 mailbox initmail(char *machine);
 void setstatus(char *str);

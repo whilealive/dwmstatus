@@ -12,7 +12,7 @@
  *          which kills it (if necessary) and re-runs it after 
  *          waking up.
  *
- * DATE     26.12.2014
+ * DATE     14.07.2015
  * OWNER    Bischofberger
  * ==================================================================
  */
@@ -31,10 +31,12 @@ mailbox initmail(char *machine)
 
     if(!strcmp("laptop", machine)) {
         tmp.mail_fast = MAIL_LAP_FAST;
+        tmp.mail_bmz  = MAIL_LAP_BMZ;
         return tmp;
     }
     else if(!strcmp("desktop", machine)) {
         tmp.mail_fast = MAIL_DESK_FAST;
+        tmp.mail_bmz  = MAIL_DESK_BMZ;
         return tmp;
     }
     else {

@@ -12,7 +12,7 @@
  *          which kills it (if necessary) and re-runs it after 
  *          waking up.
  *
- * DATE     03.04.2014
+ * DATE     14.07.2015
  * OWNER    Bischofberger
  * ==================================================================
  */
@@ -21,7 +21,24 @@
 
 #include "dwmstatus.h"
 
-char *gettime()
+char* getTimeAndDate()
+{
+    time_t t = time(NULL);
+    struct tm *tmp = localtime(&t);
+
+    if (tmp == NULL) {
+        die("localtime failure");
+    }
+
+    char outstr[40];
+    if (strftime(outstr, sizeof(outstr), "%e.%m.%y %R", tmp) == 0) {
+        die("strftime returned 0");
+    }
+    return smprintf("%s", outstr);
+}
+
+
+char* gettime()
 {
     char outstr[20];
     time_t t;

@@ -16,7 +16,7 @@
  *          For laptop: un-comment "laptop" section, for desktop do
  *          so with the "desktop" section
  *
- * DATE     26.12.2014
+ * DATE     14.07.2015
  * OWNER    Bischofberger
  * ==================================================================
  */
@@ -25,41 +25,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
-
 #include <X11/Xlib.h>
 
 #include "dwmstatus.h"
 
 static Display *dpy;
-
-void die(const char *errmsg)
-{
-    fputs(errmsg, stderr);
-    exit(EXIT_FAILURE);
-}
-
-char * smprintf(char *fmt, ...)
-{
-    va_list fmtargs;
-    char *ret;
-    int len;
-
-    va_start(fmtargs, fmt);
-    len = vsnprintf(NULL, 0, fmt, fmtargs);
-    va_end(fmtargs);
-
-    ret = malloc(++len);
-    if (ret == NULL) {
-        perror("malloc");
-        exit(1);
-    }
-
-    va_start(fmtargs, fmt);
-    vsnprintf(ret, len, fmt, fmtargs);
-    va_end(fmtargs);
-
-    return ret;
-}
 
 void setstatus(char *str)
 {
@@ -73,33 +43,28 @@ int main()
     if (!(dpy = XOpenDisplay(NULL))) {
         die("dwmstatus: cannot open display.\n");
     }
-    char *status;
-    char *bat;
-    char *vol;
-    char *time;
-    char *new_fastmail;
 
-    snd_mixer_t *handle;
-    handle = initvol();
-
-    mailbox box;
-    box = initmail("laptop");
+    snd_mixer_t *handle = initvol();
+    mailbox const box = initmail("laptop");
 
     for (;;sleep(INTERVAL)) {
-        bat = getbattery();
-        vol = getvol(handle);
-        time = gettime();
-        new_fastmail = get_nmail(box.mail_fast);
+        char* bat = getbattery();
+        char* vol = getvol(handle);
+        char* time = getTimeAndDate();
+        char* new_fastmail = get_nmail(box.mail_fast);
+        char* new_bmz = get_nmail(box.mail_bmz);
 
-        status = smprintf("[mail %s|%s] %s%s %s", new_fastmail, bat, vol, time);
+        char* status = smprintf("[mail %s|%s] %s%s %s", new_fastmail, new_bmz, bat, vol, time);
         setstatus(status);
 
         free(new_fastmail);
+        free(new_bmz);
         free(time);
         free(vol);
         free(bat);
         free(status);
     }
+
     XCloseDisplay(dpy);
     return 0;
 }
