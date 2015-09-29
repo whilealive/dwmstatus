@@ -16,7 +16,7 @@
  *          For laptop: un-comment "laptop" section, for desktop do
  *          so with the "desktop" section
  *
- * DATE     14.07.2015
+ * DATE     29.09.2015
  * OWNER    Bischofberger
  * ==================================================================
  */
@@ -53,12 +53,14 @@ int main()
         char* time = getTimeAndDate();
         char* new_fastmail = get_nmail(box.mail_fast);
         char* new_bmz = get_nmail(box.mail_bmz);
+        char* new_uzh = get_nmail(box.mail_uzh);
 
-        char* status = smprintf("[mail %s|%s] %s%s %s", new_fastmail, new_bmz, bat, vol, time);
+        char* status = smprintf("[mail %s|%s|%s] %s%s %s", new_fastmail, new_bmz, new_uzh, bat, vol, time);
         setstatus(status);
 
         free(new_fastmail);
         free(new_bmz);
+        free(new_uzh);
         free(time);
         free(vol);
         free(bat);

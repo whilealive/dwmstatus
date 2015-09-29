@@ -6,7 +6,7 @@
 # 		   for desktop/laptop version change uncomment the two
 # 		   lines on top
 #
-# DATE     14.07.2015
+# DATE     29.09.2015
 # OWNER    Bischofberger
 # ==================================================================
 #
@@ -16,13 +16,13 @@ include config.mk
 
 # DESKTOP VERSION
 # ---------------
-MAIN = main_desktop
-OBJS = utils.o mail.o time.o vol.o ${MAIN}.o
+#MAIN = main_desktop
+#OBJS = utils.o mail.o time.o vol.o ${MAIN}.o
 
 # LAPTOP VERSION
 # ---------------
-#MAIN = main_laptop
-#OBJS = utils.o batt.o mail.o vol.o time.o ${MAIN}.o
+MAIN = main_laptop
+OBJS = utils.o batt.o mail.o vol.o time.o ${MAIN}.o
 
 SRC = ${MAIN}.c
 

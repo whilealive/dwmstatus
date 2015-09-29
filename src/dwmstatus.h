@@ -12,7 +12,7 @@
  *          which kills it (if necessary) and re-runs it after 
  *          waking up.
  *
- * DATE     14.07.2015
+ * DATE     26.09.2015
  * OWNER    Bischofberger
  * ==================================================================
  */
@@ -27,15 +27,18 @@
 
 #define MAIL_LAP_FAST       "/home/laptop/Maildir/fastmail/INBOX/new"
 #define MAIL_LAP_BMZ        "/home/laptop/Maildir/bmz/INBOX/new"
+#define MAIL_LAP_UZH        "/home/laptop/Maildir/uzh-pseudo/uzh/new"
 
 #define MAIL_DESK_FAST      "/home/desktop/Maildir/fastmail/INBOX/new"
 #define MAIL_DESK_BMZ       "/home/desktop/Maildir/bmz/INBOX/new"
+#define MAIL_DESK_UZH       "/home/desktop/Maildir/uzh-pseudo/uzh/new"
 
 #define ROUND_UNSIGNED(d)   ( (int) ((d) + ((d) > 0 ? 0.5 : -0.5)) )
 
 typedef struct {
     char *mail_fast;
     char *mail_bmz;
+    char *mail_uzh;
 } mailbox;
 
 void die();
