@@ -12,7 +12,7 @@
  *          which kills it (if necessary) and re-runs it after 
  *          waking up.
  *
- * DATE     26.09.2015
+ * DATE     23.03.2016
  * OWNER    Bischofberger
  * ==================================================================
  */
@@ -21,13 +21,14 @@
 
 #define INTERVAL            60  /* seconds */
 
-#define BATT_NOW            "/sys/class/power_supply/BAT1/charge_now"
-#define BATT_FULL           "/sys/class/power_supply/BAT1/charge_full"
-#define BATT_STATUS         "/sys/class/power_supply/BAT1/status"
+#define BATT_NOW            "/sys/class/power_supply/BAT0/energy_now"
+#define BATT_FULL           "/sys/class/power_supply/BAT0/energy_full"
+#define BATT_STATUS         "/sys/class/power_supply/BAT0/status"
+#define BATT_LOW            5  /* percent */
 
-#define MAIL_LAP_FAST       "/home/laptop/Maildir/fastmail/INBOX/new"
-#define MAIL_LAP_BMZ        "/home/laptop/Maildir/bmz/INBOX/new"
-#define MAIL_LAP_UZH        "/home/laptop/Maildir/uzh-pseudo/uzh/new"
+#define MAIL_LAP_FAST       "/home/laptop2/Maildir/fastmail/INBOX/new"
+#define MAIL_LAP_BMZ        "/home/laptop2/Maildir/bmz/INBOX/new"
+#define MAIL_LAP_UZH        "/home/laptop2/Maildir/uzh-pseudo/uzh/new"
 
 #define MAIL_DESK_FAST      "/home/desktop/Maildir/fastmail/INBOX/new"
 #define MAIL_DESK_BMZ       "/home/desktop/Maildir/bmz/INBOX/new"
