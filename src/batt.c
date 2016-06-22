@@ -11,7 +11,7 @@
  *          a custom systemd service (or bash script) which kills it (if
  *          necessary) and re-runs it after waking up.
  *
- * DATE     28.03.2016
+ * DATE     22.06.2016
  * OWNER    Bischofberger
  * ==================================================================
  */
@@ -21,6 +21,8 @@
 #include <unistd.h>  /* for calling "susp"-script if battery is low */
 
 #include "dwmstatus.h"
+
+//#define SUSPEND_ON_LOW_BAT
 
 void suspendOnLowBat(long const current)
 {
@@ -54,7 +56,9 @@ char * getbattery()
       s = '=';
     }
     long current = full/(now/100);
+#ifdef SUSPEND_ON_LOW_BAT
     suspendOnLowBat(current);
+#endif
     return smprintf("[bat %c%ld] ",s , current);
   }
   else {
