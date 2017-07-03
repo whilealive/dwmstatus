@@ -6,17 +6,7 @@
  *          git://git.suckless.org/dwmstatus,
  *          and alsa stuff from https://github.com/Unia/dwmst
  *
- *          Attention: dwmstatus is likely to crash when suspending 
- *          computer while it is not in sleep() state. Therefore, 
- *          we have to run a custom systemd service (or bash script) 
- *          which kills it (if necessary) and re-runs it after 
- *          waking up.
- *
- *          Depending on the machine we use different main.c versions
- *          For laptop: un-comment "laptop" section, for desktop do
- *          so with the "desktop" section
- *
- * DATE     26.09.2015
+ * DATE     03.07.2017
  * OWNER    Bischofberger
  * ==================================================================
  */
@@ -37,7 +27,6 @@ void setstatus(char *str)
     XSync(dpy, False);
 }
 
-/* DESKTOP VERSION */
 int main()
 {
     if (!(dpy = XOpenDisplay(NULL))) {
@@ -45,16 +34,17 @@ int main()
     }
 
     snd_mixer_t *handle = initvol();
-    mailbox box = initmail("desktop");
+    mailbox box = initmail();
 
     for (;;sleep(INTERVAL)) {
+        char* bat = getbattery();
         char* vol = getvol(handle);
         char* time = getTimeAndDate();
         char* new_fastmail = get_nmail(box.mail_fast);
         char* new_bmz = get_nmail(box.mail_bmz);
         char* new_uzh = get_nmail(box.mail_uzh);
 
-        char* status = smprintf("[mail %s|%s|%s] %s %s", new_fastmail, new_bmz, new_uzh, vol, time);
+        char* status = smprintf("[mail %s|%s|%s] %s%s %s", new_fastmail, new_bmz, new_uzh, bat, vol, time);
         setstatus(status);
 
         free(new_fastmail);

@@ -6,12 +6,16 @@
  *          git://git.suckless.org/dwmstatus,
  *          and alsa stuff from https://github.com/Unia/dwmst
  *
- * DATE     14.07.2015
+ * DATE     02.07.2017
  * OWNER    Bischofberger
  * ==================================================================
  */
 
 #include "dwmstatus.h"
+
+#include <unistd.h>
+#include <sys/types.h>
+#include <pwd.h>
 
 void die(const char *errmsg)
 {
@@ -40,5 +44,16 @@ char* smprintf(char *fmt, ...)
     va_end(fmtargs);
 
     return ret;
+}
+
+char* getHomeDir()
+{
+  char *homedir;
+
+  if ((homedir = getenv("HOME")) == NULL) {
+    homedir = getpwuid(getuid())->pw_dir;
+  }
+
+  return homedir;
 }
 

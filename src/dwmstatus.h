@@ -6,13 +6,7 @@
  *          git://git.suckless.org/dwmstatus,
  *          and alsa stuff from https://github.com/Unia/dwmst
  *
- *          Attention: dwmstatus is likely to crash when suspending 
- *          computer while it is not in sleep() state. Therefore, 
- *          we have to run a custom systemd service (or bash script) 
- *          which kills it (if necessary) and re-runs it after 
- *          waking up.
- *
- * DATE     23.03.2016
+ * DATE     02.07.2017
  * OWNER    Bischofberger
  * ==================================================================
  */
@@ -26,13 +20,9 @@
 #define BATT_STATUS         "/sys/class/power_supply/BAT0/status"
 #define BATT_LOW            5  /* percent */
 
-#define MAIL_LAP_FAST       "/home/laptop2/Maildir/fastmail/INBOX/new"
-#define MAIL_LAP_BMZ        "/home/laptop2/Maildir/bmz/INBOX/new"
-#define MAIL_LAP_UZH        "/home/laptop2/Maildir/uzh-pseudo/uzh/new"
-
-#define MAIL_DESK_FAST      "/home/desktop/Maildir/fastmail/INBOX/new"
-#define MAIL_DESK_BMZ       "/home/desktop/Maildir/bmz/INBOX/new"
-#define MAIL_DESK_UZH       "/home/desktop/Maildir/uzh-pseudo/uzh/new"
+#define MAIL_FAST           "/Maildir/fastmail/INBOX/new"
+#define MAIL_BMZ            "/Maildir/bmz/INBOX/new"
+#define MAIL_UZH            "/Maildir/uzh-pseudo/uzh/new"
 
 #define ROUND_UNSIGNED(d)   ( (int) ((d) + ((d) > 0 ? 0.5 : -0.5)) )
 
@@ -44,11 +34,12 @@ typedef struct {
 
 void die();
 char * smprintf(char *fmt, ...);
+char *getHomeDir();
 char * getbattery();
 snd_mixer_t *initvol();
 char * getvol(snd_mixer_t *handle);
 char *get_nmail(char *directory);
 char *gettime();
 char *getTimeAndDate();
-mailbox initmail(char *machine);
+mailbox initmail();
 void setstatus(char *str);

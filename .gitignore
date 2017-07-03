@@ -3,9 +3,10 @@
 # MACHINE  all
 # INFO     -
 #
-# DATE     12.08.2014
+# DATE     02.07.2017
 # OWNER    Bischofberger
 # ==================================================================
 
 # git shall ignore the following
 old/
+*.swp
