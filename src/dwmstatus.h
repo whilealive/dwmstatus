@@ -6,7 +6,7 @@
  *          git://git.suckless.org/dwmstatus,
  *          and alsa stuff from https://github.com/Unia/dwmst
  *
- * DATE     02.07.2017
+ * DATE     05.07.2017
  * OWNER    Bischofberger
  * ==================================================================
  */
@@ -27,9 +27,9 @@
 #define ROUND_UNSIGNED(d)   ( (int) ((d) + ((d) > 0 ? 0.5 : -0.5)) )
 
 typedef struct {
-    char *mail_fast;
-    char *mail_bmz;
-    char *mail_uzh;
+  char *mail_fast;
+  char *mail_bmz;
+  char *mail_uzh;
 } mailbox;
 
 void die();

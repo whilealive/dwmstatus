@@ -6,7 +6,7 @@
  *          git://git.suckless.org/dwmstatus,
  *          and alsa stuff from https://github.com/Unia/dwmst
  *
- * DATE     03.07.2017
+ * DATE     05.07.2017
  * OWNER    Bischofberger
  * ==================================================================
  */
@@ -23,37 +23,37 @@ static Display *dpy;
 
 void setstatus(char *str)
 {
-    XStoreName(dpy, DefaultRootWindow(dpy), str);
-    XSync(dpy, False);
+  XStoreName(dpy, DefaultRootWindow(dpy), str);
+  XSync(dpy, False);
 }
 
 int main()
 {
-    if (!(dpy = XOpenDisplay(NULL))) {
-        die("dwmstatus: cannot open display.\n");
-    }
+  if (!(dpy = XOpenDisplay(NULL))) {
+    die("dwmstatus: cannot open display.\n");
+  }
 
-    snd_mixer_t *handle = initvol();
-    mailbox box = initmail();
+  snd_mixer_t *handle = initvol();
+  mailbox box = initmail();
 
-    for (;;sleep(INTERVAL)) {
-        char* bat = getbattery();
-        char* vol = getvol(handle);
-        char* time = getTimeAndDate();
-        char* new_fastmail = get_nmail(box.mail_fast);
-        char* new_bmz = get_nmail(box.mail_bmz);
-        char* new_uzh = get_nmail(box.mail_uzh);
+  for (;;sleep(INTERVAL)) {
+    char* bat = getbattery();
+    char* vol = getvol(handle);
+    char* time = getTimeAndDate();
+    char* new_fastmail = get_nmail(box.mail_fast);
+    char* new_bmz = get_nmail(box.mail_bmz);
+    char* new_uzh = get_nmail(box.mail_uzh);
 
-        char* status = smprintf("[mail %s|%s|%s] %s%s %s", new_fastmail, new_bmz, new_uzh, bat, vol, time);
-        setstatus(status);
+    char* status = smprintf("[mail %s|%s|%s] %s%s %s", new_fastmail, new_bmz, new_uzh, bat, vol, time);
+    setstatus(status);
 
-        free(new_fastmail);
-        free(new_bmz);
-        free(new_uzh);
-        free(time);
-        free(vol);
-        free(status);
-    }
-    XCloseDisplay(dpy);
-    return 0;
+    free(new_fastmail);
+    free(new_bmz);
+    free(new_uzh);
+    free(time);
+    free(vol);
+    free(status);
+  }
+  XCloseDisplay(dpy);
+  return 0;
 }

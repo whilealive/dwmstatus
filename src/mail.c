@@ -6,7 +6,7 @@
  *          git://git.suckless.org/dwmstatus,
  *          and alsa stuff from https://github.com/Unia/dwmst
  *
- * DATE     02.07.2017
+ * DATE     05.07.2017
  * OWNER    Bischofberger
  * ==================================================================
  */
@@ -21,34 +21,34 @@
 
 mailbox initmail()
 {
-    const char* homedir = getHomeDir();
+  const char* homedir = getHomeDir();
 
-    mailbox tmp;
+  mailbox tmp;
 
-    asprintf(&tmp.mail_fast, "%s%s", homedir, MAIL_FAST);
-    asprintf(&tmp.mail_bmz, "%s%s", homedir, MAIL_BMZ);
-    asprintf(&tmp.mail_uzh, "%s%s", homedir, MAIL_UZH);
+  asprintf(&tmp.mail_fast, "%s%s", homedir, MAIL_FAST);
+  asprintf(&tmp.mail_bmz, "%s%s", homedir, MAIL_BMZ);
+  asprintf(&tmp.mail_uzh, "%s%s", homedir, MAIL_UZH);
 
-    return tmp;
+  return tmp;
 }
 
 char *get_nmail(char *directory)
 {
-    /* directory : Maildir path */
-    int n = 0;
-    DIR* dir = NULL;
-    struct dirent* rf = NULL;
+  /* directory : Maildir path */
+  int n = 0;
+  DIR* dir = NULL;
+  struct dirent* rf = NULL;
 
-    dir = opendir(directory);  /* try to open directory */
-    if (dir == NULL) {
-        return smprintf("e");
+  dir = opendir(directory);  /* try to open directory */
+  if (dir == NULL) {
+    return smprintf("e");
+  }
+  while ((rf = readdir(dir)) != NULL) {  /*count number of files */
+    if (strcmp(rf->d_name, ".") != 0 && strcmp(rf->d_name, "..") != 0) {
+      n++;
     }
-    while ((rf = readdir(dir)) != NULL) {  /*count number of files */
-        if (strcmp(rf->d_name, ".") != 0 && strcmp(rf->d_name, "..") != 0) {
-            n++;
-        }
-    }
-    closedir(dir);
+  }
+  closedir(dir);
 
-   return smprintf("%d", n);
+  return smprintf("%d", n);
 }

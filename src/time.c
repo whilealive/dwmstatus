@@ -6,7 +6,7 @@
  *          git://git.suckless.org/dwmstatus,
  *          and alsa stuff from https://github.com/Unia/dwmst
  *
- * DATE     02.07.2017
+ * DATE     05.07.2017
  * OWNER    Bischofberger
  * ==================================================================
  */
@@ -17,35 +17,35 @@
 
 char* getTimeAndDate()
 {
-    time_t t = time(NULL);
-    struct tm *tmp = localtime(&t);
+  time_t t = time(NULL);
+  struct tm *tmp = localtime(&t);
 
-    if (tmp == NULL) {
-        die("localtime failure");
-    }
+  if (tmp == NULL) {
+    die("localtime failure");
+  }
 
-    char outstr[40];
-    if (strftime(outstr, sizeof(outstr), "%e.%m.%y %R", tmp) == 0) {
-        die("strftime returned 0");
-    }
-    return smprintf("%s", outstr);
+  char outstr[40];
+  if (strftime(outstr, sizeof(outstr), "%e.%m.%y %R", tmp) == 0) {
+    die("strftime returned 0");
+  }
+  return smprintf("%s", outstr);
 }
 
 
 char* gettime()
 {
-    char outstr[20];
-    time_t t;
-    struct tm *tmp;
+  char outstr[20];
+  time_t t;
+  struct tm *tmp;
 
-    t = time(NULL);
-    tmp = localtime(&t);
+  t = time(NULL);
+  tmp = localtime(&t);
 
-    if (tmp == NULL) {
-        die("localtime failure");
-    }
-    if (strftime(outstr, sizeof(outstr), "%R", tmp) == 0) {
-        die("strftime returned 0");
-    }
-    return smprintf("%s", outstr);
+  if (tmp == NULL) {
+    die("localtime failure");
+  }
+  if (strftime(outstr, sizeof(outstr), "%R", tmp) == 0) {
+    die("strftime returned 0");
+  }
+  return smprintf("%s", outstr);
 }
