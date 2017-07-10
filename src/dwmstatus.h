@@ -22,6 +22,7 @@
 
 #define MAIL_FAST           "/Maildir/fastmail/INBOX/new"
 #define MAIL_BMZ            "/Maildir/bmz/INBOX/new"
+#define MAIL_BMZ_EX         "/Maildir/bmz/Erstellungsteam/new"
 #define MAIL_UZH            "/Maildir/uzh-pseudo/uzh/new"
 
 #define ROUND_UNSIGNED(d)   ( (int) ((d) + ((d) > 0 ? 0.5 : -0.5)) )
@@ -29,6 +30,7 @@
 typedef struct {
   char *mail_fast;
   char *mail_bmz;
+  char *mail_bmz_ex;
   char *mail_uzh;
 } mailbox;
 
@@ -38,7 +40,7 @@ char *getHomeDir();
 char * getbattery();
 snd_mixer_t *initvol();
 char * getvol(snd_mixer_t *handle);
-char *get_nmail(char *directory);
+char *get_nmail(int n_args, ...);
 char *gettime();
 char *getTimeAndDate();
 mailbox initmail();

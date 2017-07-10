@@ -40,9 +40,9 @@ int main()
     char* bat = getbattery();
     char* vol = getvol(handle);
     char* time = getTimeAndDate();
-    char* new_fastmail = get_nmail(box.mail_fast);
-    char* new_bmz = get_nmail(box.mail_bmz);
-    char* new_uzh = get_nmail(box.mail_uzh);
+    char* new_fastmail = get_nmail(1, box.mail_fast);
+    char* new_bmz = get_nmail(2, box.mail_bmz, box.mail_bmz_ex);
+    char* new_uzh = get_nmail(1, box.mail_uzh);
 
     char* status = smprintf("[mail %s|%s|%s] %s%s %s", new_fastmail, new_bmz, new_uzh, bat, vol, time);
     setstatus(status);
