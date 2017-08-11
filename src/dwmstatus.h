@@ -6,7 +6,7 @@
  *          git://git.suckless.org/dwmstatus,
  *          and alsa stuff from https://github.com/Unia/dwmst
  *
- * DATE     05.07.2017
+ * DATE     08.08.2017
  * OWNER    Bischofberger
  * ==================================================================
  */
@@ -21,6 +21,7 @@
 #define BATT_LOW            5  /* percent */
 
 #define MAIL_FAST           "/Maildir/fastmail/INBOX/new"
+#define MAIL_FAST_BC        "/Maildir/fastmail/Bandcamp/new"
 #define MAIL_BMZ            "/Maildir/bmz/INBOX/new"
 #define MAIL_BMZ_EX         "/Maildir/bmz/Erstellungsteam/new"
 #define MAIL_UZH            "/Maildir/uzh-pseudo/uzh/new"
@@ -29,6 +30,7 @@
 
 typedef struct {
   char *mail_fast;
+  char *mail_fast_bc;
   char *mail_bmz;
   char *mail_bmz_ex;
   char *mail_uzh;
