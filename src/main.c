@@ -6,7 +6,7 @@
  *          git://git.suckless.org/dwmstatus,
  *          and alsa stuff from https://github.com/Unia/dwmst
  *
- * DATE     08.08.2017
+ * DATE     19.08.2017
  * OWNER    Bischofberger
  * ==================================================================
  */
@@ -40,7 +40,7 @@ int main()
     char* bat = getbattery();
     char* vol = getvol(handle);
     char* time = getTimeAndDate();
-    char* new_fastmail = get_nmail(2, box.mail_fast, box.mail_fast_bc);
+    char* new_fastmail = get_nmail(1, box.mail_fast);
     char* new_bmz = get_nmail(2, box.mail_bmz, box.mail_bmz_ex);
     char* new_uzh = get_nmail(1, box.mail_uzh);
 

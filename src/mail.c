@@ -6,7 +6,7 @@
  *          git://git.suckless.org/dwmstatus,
  *          and alsa stuff from https://github.com/Unia/dwmst
  *
- * DATE     05.07.2017
+ * DATE     19.08.2017
  * OWNER    Bischofberger
  * ==================================================================
  */
@@ -27,7 +27,6 @@ mailbox initmail()
   mailbox tmp;
 
   asprintf(&tmp.mail_fast, "%s%s", homedir, MAIL_FAST);
-  asprintf(&tmp.mail_fast_bc, "%s%s", homedir, MAIL_FAST_BC);
   asprintf(&tmp.mail_bmz, "%s%s", homedir, MAIL_BMZ);
   asprintf(&tmp.mail_bmz_ex, "%s%s", homedir, MAIL_BMZ_EX);
   asprintf(&tmp.mail_uzh, "%s%s", homedir, MAIL_UZH);
